@@ -1,9 +1,14 @@
-import { Photo } from './utils'
+import { PhotoService } from './services/photo'
+import { Io } from './utils'
 
 const main = async () => {
-  const months = [1, 2, 3, 4, 5, 6]
-  const photos = await Photo.getPhotosByMounth(6)
-  console.log(photos.length)
+  const photoService = new PhotoService()
+
+  const months: string[] = Io.readInputFile('months')
+
+  for (const month of months) {
+    await photoService.getPhotosByMounth(month)
+  }
 }
 
 main()
