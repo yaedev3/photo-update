@@ -1,4 +1,5 @@
-import { PhotoService } from './services/photo'
+import { getStudentPhotoFromDB } from './database'
+import { PhotoService } from './services'
 import { Io } from './utils'
 
 enum Options {
@@ -21,11 +22,12 @@ const downloadPhotoDB = async () => {
   const months: string[] = Io.readInputFile('months')
 
   for (const month of months) {
-    const photos = await photoService.getPhotosByMonth(month)
-    const photo = photos[0]
+    const students = await photoService.getPhotosByMonth(month)
+    const student = students[0]
     console.log('photos')
-    console.log(photos.length)
-    console.log(photo)
+    console.log(students.length)
+    console.log(student)
+    getStudentPhotoFromDB(student.id)
 
     return
   }

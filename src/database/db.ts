@@ -1,30 +1,61 @@
-import sql from 'mssql'
+import { config, connect, Request } from 'mssql'
 
-const CONNECTION_STRINGS = {
-  Escolares:
-    'data source=datos.finanzas.uaslp.mx,2326;initial catalog=s.escolares;user id=app_SDA;password=@Pp$D@;database=Escolares',
-  Aspirantes:
-    'data source=148.224.252.254;initial catalog=app_user_w;user id=app_user_w;password=AppUser7W#;database=Preinscripcion',
+interface ConnectionModel {
+  Escolares: config
+  Aspirantes: config
+  Default: config
 }
 
-const pools = new Map<string, sql.ConnectionPool>()
-
-const getConnection = async (
-  connectionString: string,
-): Promise<sql.ConnectionPool> => {
-  if (pools.has(connectionString)) {
-    return pools.get(connectionString)!
-  }
-
-  const pool = new sql.ConnectionPool(connectionString)
-  await pool.connect()
-  pools.set(connectionString, pool)
-  return pool
+const connections: ConnectionModel = {
+  Escolares: {
+    user: 'app_SDA',
+    password: '@Pp$D@',
+    server: 'datos.finanzas.uaslp.mx',
+    database: 'Escolares',
+    port: 2326,
+  },
+  Aspirantes: {
+    user: 'app_user_w',
+    password: 'AppUser7W#',
+    server: '148.224.252.254',
+    database: 'Preinscripcion',
+  },
+  Default: {
+    user: '',
+    password: '',
+    server: '',
+    database: '',
+    options: {
+      encrypt: false,
+      trustServerCertificate: true,
+    },
+    connectionTimeout: 600000,
+    pool: {
+      max: 10,
+      min: 0,
+      idleTimeoutMillis: 30000,
+    },
+  },
 }
 
-export const getConnections = async () => {
-  return {
-    Escolares: await getConnection(CONNECTION_STRINGS.Escolares),
-    Aspirantes: await getConnection(CONNECTION_STRINGS.Aspirantes),
+export const selectEscolares = async <T>(query: string): Promise<T> => {
+  return select(query, connections.Escolares)
+}
+
+export const selectAspirantes = async <T>(query: string): Promise<T> => {
+  return select(query, connections.Aspirantes)
+}
+
+const select = async (query: string, config: config): Promise<any> => {
+  try {
+    await connect({
+      ...connections.Default,
+      ...config,
+    })
+    const request = new Request()
+    const result = await request.query(query)
+    return result.recordset
+  } catch (error) {
+    console.log(error)
   }
 }
