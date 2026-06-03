@@ -1,4 +1,8 @@
-import { getStudentPhotoFromDB, SqliteService } from './database'
+import {
+  getStudentPhotoFromAspirantes,
+  getStudentPhotoFromDB,
+  SqliteService,
+} from './database'
 import { PhotoService } from './services'
 import { Io } from './utils'
 
@@ -25,7 +29,7 @@ const downloadPhotoDB = async () => {
   for (const month of months) {
     const students = await photoService.getPhotosByMonth(month)
     for (const student of students) {
-      const photo = await getStudentPhotoFromDB(student.id)
+      const photo = await getStudentPhotoFromAspirantes(student.id)
       sqliteService.insertPhoto(student.id, month, photo)
     }
   }
