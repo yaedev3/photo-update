@@ -5,7 +5,17 @@ import { Io } from '../utils'
 export class PhotoService {
   private month: string = ''
 
-  public async getPhotosByMounth(month: string): Promise<Student[]> {
+  public async savePhotosByMonth(month: string) {
+    this.month = month
+    const file = this.getFileName()
+
+    if (Io.checkIfOutputFileExists(file)) return
+
+    const photos = await this.getPhotosFromAPI()
+    this.storePhotos(photos)
+  }
+
+  public async getPhotosByMonth(month: string): Promise<Student[]> {
     this.month = month
     const file = this.getFileName()
     let photos: Student[] = []
