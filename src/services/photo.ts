@@ -18,16 +18,11 @@ export class PhotoService {
   public async getPhotosByMonth(month: string): Promise<Student[]> {
     this.month = month
     const file = this.getFileName()
-    let photos: Student[] = []
 
     if (!Io.checkIfOutputFileExists(file)) {
-      photos = await this.getPhotosFromAPI()
-      this.storePhotos(photos)
-    } else {
-      photos = this.getPhotosFromFile()
+      return []
     }
-
-    return photos
+    return this.getPhotosFromFile()
   }
 
   private storePhotos(photos: Student[]): void {

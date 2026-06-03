@@ -1,4 +1,6 @@
 export const DB_QUERIES = {
-  StudentPhoto: (id: string) =>
+  StudentPhotoEscolares: (id: string) =>
     `SELECT EstadisticasSE.FotografiaAspirante('${id.padStart(7, '0')}')`,
+  StudentPhotoAspirantes: (id: string) =>
+    `SELECT EstadisticasSE.FotografiaAspirante('${id}')`,
 }
