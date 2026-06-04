@@ -79,6 +79,22 @@ export class MenuService {
     })
   }
 
+  public updatePhotos(): void {
+    const months: string[] = this.getMonthList()
+    const sqliteService = new SqliteService(DbSource.Escolares)
+
+    for (const month of months) {
+      // const students: string[] = sqliteService.getStudentsByMonth(month)
+      const students: string[] = this.getTestSTudents()
+      console.log(students)
+      return
+    }
+  }
+
+  private getTestSTudents(): string[] {
+    return ['338089', '316507']
+  }
+
   private getMonthList(): string[] {
     return Io.readInputFile('months')
   }

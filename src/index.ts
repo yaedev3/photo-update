@@ -24,6 +24,7 @@ const main = async () => {
       return
 
     case MenuOptions.UploadPhotoList:
+      await menuService.updatePhotos()
       return
   }
 }

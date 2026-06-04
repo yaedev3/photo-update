@@ -56,14 +56,14 @@ export class SqliteService {
   }
 
   public isMonthCompleted(month: string, studentsCount: number): boolean {
-    const photosInDB: number = this.getTotalPhotosByMonth(month)
+    const photosInDB: number = this.getStudentsByMonth(month).length
     return photosInDB === studentsCount
   }
 
-  private getTotalPhotosByMonth(month: string): number {
+  public getStudentsByMonth(month: string): string[] {
     const query = QUERIES.count
     const data: any[] = this.db.where(query, [month])
-    return data.length
+    return data.map((d) => d.id)
   }
 
   private existsPhoto(id: string) {
