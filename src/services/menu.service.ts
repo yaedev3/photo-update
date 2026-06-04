@@ -86,7 +86,10 @@ export class MenuService {
     for (const month of months) {
       // const students: string[] = sqliteService.getStudentsByMonth(month)
       const students: string[] = this.getTestSTudents()
-      console.log(students)
+      for (const student of students) {
+        const photo = sqliteService.getStudentPhoto(student)
+        console.log(photo)
+      }
       return
     }
   }

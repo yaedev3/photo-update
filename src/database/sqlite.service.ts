@@ -1,5 +1,5 @@
-import Database from 'better-sqlite3'
 import { DbSource } from './interfaces'
+import { SqliteDatabase } from './sqllite-database'
 
 const QUERIES = {
   init: `
@@ -18,11 +18,17 @@ const QUERIES = {
     FROM Photo
     WHERE id = ?
   `,
-  count: `
+  students: `
     SELECT 
     id
     FROM Photo
     WHERE month = ?
+  `,
+  photo: `
+    SELECT 
+    picture
+    FROM Photo
+    WHERE id = ?
   `,
 }
 
@@ -61,9 +67,15 @@ export class SqliteService {
   }
 
   public getStudentsByMonth(month: string): string[] {
-    const query = QUERIES.count
+    const query = QUERIES.students
     const data: any[] = this.db.where(query, [month])
     return data.map((d) => d.id)
+  }
+
+  public getStudentPhoto(id: string) {
+    const query = QUERIES.photo
+    const data = this.db.blob(query, id)
+    return data
   }
 
   private existsPhoto(id: string) {
@@ -74,32 +86,5 @@ export class SqliteService {
 
   private getInitQueries(): string[] {
     return [QUERIES.init]
-  }
-}
-
-class SqliteDatabase {
-  private db
-
-  constructor(name: string, queries: string[]) {
-    this.db = new Database(name)
-    this.initDatabase(queries)
-  }
-
-  public insert(query: string, data: string[]): void {
-    this.db.prepare(query).run(...data)
-  }
-
-  public select<T>(query: string): T[] {
-    return []
-  }
-
-  public where<T>(query: string, filter: string[]): T[] {
-    return <T[]>this.db.prepare(query).all(...filter)
-  }
-
-  private initDatabase(queries: string[]): void {
-    queries.forEach((query) => {
-      this.db.exec(query)
-    })
   }
 }
