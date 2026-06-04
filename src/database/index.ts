@@ -1,4 +1,5 @@
 export * from './db'
 export * from './query'
 export * from './photo'
-export * from './sqlite'
+export * from './sqlite.service'
+export * from './interfaces'

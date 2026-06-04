@@ -1,6 +1,5 @@
 import Database from 'better-sqlite3'
-
-const DB_PATH = 'data/photos.db'
+import { DbSource } from './interfaces'
 
 const QUERIES = {
   init: `
@@ -22,8 +21,9 @@ const QUERIES = {
 export class SqliteService {
   private db
 
-  constructor() {
-    this.db = new SqliteDatabase(DB_PATH, this.getInitQueries())
+  constructor(source: DbSource) {
+    const path = this.getDBPath(source)
+    this.db = new SqliteDatabase(path, this.getInitQueries())
   }
 
   public insertPhoto(id: string, month: string, photo: any) {
@@ -32,6 +32,11 @@ export class SqliteService {
       return
     }
     this.insertPhotoProtected(id, month, photo)
+  }
+
+  private getDBPath(source: DbSource): string {
+    if (source === DbSource.Aspirantes) return 'data/photos_aspirantes.db'
+    return 'data/photos_escolares.db'
   }
 
   private insertPhotoProtected(id: string, month: string, photo: any) {

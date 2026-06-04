@@ -1,58 +1,29 @@
-import {
-  getStudentPhotoFromAspirantes,
-  getStudentPhotoFromDB,
-  SqliteService,
-} from './database'
-import { PhotoService } from './services'
-import { Io } from './utils'
-
-enum Options {
-  DownloadPhotoList = 'list',
-  DownloadPhotoDB = 'db',
-  UploadPhotoList = 'up',
-}
-
-const downloadPhotoList = async () => {
-  const photoService = new PhotoService()
-  const months: string[] = Io.readInputFile('months')
-
-  for (const month of months) {
-    await photoService.savePhotosByMonth(month)
-  }
-}
-
-const downloadPhotoDB = async () => {
-  const photoService = new PhotoService()
-  const months: string[] = Io.readInputFile('months')
-  const sqliteService = new SqliteService()
-
-  for (const month of months) {
-    const students = await photoService.getPhotosByMonth(month)
-    for (const student of students) {
-      const photo = await getStudentPhotoFromAspirantes(student.id)
-      sqliteService.insertPhoto(student.id, month, photo)
-    }
-  }
-}
+import { DbSource } from './database'
+import { MenuOptions, MenuService } from './services'
 
 const main = async () => {
-  const option: Options = process.argv[2] as Options
+  const option: MenuOptions = process.argv[2] as MenuOptions
+  const menuService = new MenuService()
 
   if (!option) {
-    console.log('Option is required')
+    menuService.printMenuOptions()
     return
   }
 
   switch (option) {
-    case Options.DownloadPhotoList:
-      await downloadPhotoList()
+    case MenuOptions.DownloadPhotoList:
+      await menuService.downloadPhotoList()
       return
 
-    case Options.DownloadPhotoDB:
-      await downloadPhotoDB()
+    case MenuOptions.DownloadPhotoAspirantes:
+      await menuService.downloadPhotosFromDb(DbSource.Aspirantes)
       return
 
-    case Options.UploadPhotoList:
+    case MenuOptions.DownloadPhotoEscolares:
+      await menuService.downloadPhotosFromDb(DbSource.Escolares)
+      return
+
+    case MenuOptions.UploadPhotoList:
       return
   }
 }
