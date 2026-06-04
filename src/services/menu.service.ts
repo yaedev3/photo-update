@@ -6,6 +6,7 @@ import {
   SqliteService,
 } from '../database'
 import { PhotoService } from '.'
+import { Student } from '../interfaces'
 
 export enum MenuOptions {
   DownloadPhotoList = 'list',
@@ -39,15 +40,35 @@ export class MenuService {
   public async downloadPhotosFromDb(source: DbSource): Promise<void> {
     const months: string[] = this.getMonthList()
     const sqliteService = new SqliteService(source)
-    for (const month of months) {
-      const students = await this.photoService.getPhotosByMonth(month)
+    const getPohotoFrom = this.getDbSource(source)
 
-      for (const student of students) {
-        const getPohotoFrom = this.getDbSource(source)
-        const photo = await getPohotoFrom(student.id)
-        sqliteService.insertPhoto(student.id, month, photo)
+    for (const month of months) {
+      const students: Student[] =
+        await this.photoService.getPhotosByMonth(month)
+      const downloadStatus: boolean[] = []
+      const canSkipped = sqliteService.isMonthCompleted(month, students.length)
+
+      if (!canSkipped) {
+        for (const student of students) {
+          const photo = await getPohotoFrom(student.id)
+          const status = sqliteService.insertPhoto(student.id, month, photo)
+          downloadStatus.push(status)
+        }
       }
+
+      this.printStatusSummary(downloadStatus, month)
     }
+  }
+
+  private printStatusSummary(downloadStatus: boolean[], month: string): void {
+    const success: number = downloadStatus.filter((s) => s).length
+    const error: number = downloadStatus.filter((s) => s).length
+    const total: number = downloadStatus.length
+
+    console.log(`Resumen del mes ${month}`)
+    console.log(`Alumnos insertados ${success}`)
+    console.log(`Alumnos que no se pudieron insertar ${error}`)
+    console.log(`Total de alumnos ${total}`)
   }
 
   public printMenuOptions(): void {

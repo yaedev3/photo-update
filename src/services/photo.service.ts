@@ -37,13 +37,13 @@ export class PhotoService {
   }
 
   private async getPhotosFromAPI(): Promise<Student[]> {
-    console.log('Getting photos from API')
+    console.log('Obteniendo fotos desde la API')
     const url: string = `${API_URLS.PhotoByMonth}/${this.month}`
     return await Request.get<Student[]>(url)
   }
 
   private getPhotosFromFile(): Student[] {
-    console.log('Getting photos from file')
+    console.log(`Obteniendo fotos del archivo para el mes ${this.month}`)
     const file = this.getFileName()
     return <Student[]>Io.readOutputFile(file)
   }

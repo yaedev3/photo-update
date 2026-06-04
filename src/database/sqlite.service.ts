@@ -13,8 +13,16 @@ const QUERIES = {
     INSERT INTO Photo (id, month, picture) VALUES (?, ?, ?)
   `,
   exists: `
-    SELECT * fROM Photo
+    SELECT 
+    * 
+    FROM Photo
     WHERE id = ?
+  `,
+  count: `
+    SELECT 
+    id
+    FROM Photo
+    WHERE month = ?
   `,
 }
 
@@ -26,12 +34,10 @@ export class SqliteService {
     this.db = new SqliteDatabase(path, this.getInitQueries())
   }
 
-  public insertPhoto(id: string, month: string, photo: any) {
-    if (this.existsPhoto(id)) {
-      console.log(`El alumno ${id} ya existe`)
-      return
-    }
+  public insertPhoto(id: string, month: string, photo: any): boolean {
+    if (this.existsPhoto(id)) return false
     this.insertPhotoProtected(id, month, photo)
+    return true
   }
 
   private getDBPath(source: DbSource): string {
@@ -47,6 +53,17 @@ export class SqliteService {
       console.log(error)
       console.log(`Error al insertar al alumno ${id}`)
     }
+  }
+
+  public isMonthCompleted(month: string, studentsCount: number): boolean {
+    const photosInDB: number = this.getTotalPhotosByMonth(month)
+    return photosInDB === studentsCount
+  }
+
+  private getTotalPhotosByMonth(month: string): number {
+    const query = QUERIES.count
+    const data: any[] = this.db.where(query, [month])
+    return data.length
   }
 
   private existsPhoto(id: string) {
