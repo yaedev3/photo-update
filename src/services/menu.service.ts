@@ -4,6 +4,7 @@ import {
   getStudentPhotoFromAspirantes,
   getStudentPhotoFromDB,
   SqliteService,
+  updatePhotoToAspirantes,
 } from '../database'
 import { PhotoService } from '.'
 import { Student } from '../interfaces'
@@ -79,16 +80,17 @@ export class MenuService {
     })
   }
 
-  public updatePhotos(): void {
+  public async updatePhotos(): Promise<void> {
     const months: string[] = this.getMonthList()
     const sqliteService = new SqliteService(DbSource.Escolares)
 
     for (const month of months) {
-      // const students: string[] = sqliteService.getStudentsByMonth(month)
-      const students: string[] = this.getTestSTudents()
+      const students: string[] = sqliteService.getStudentsByMonth(month)
+      // const students: string[] = this.getTestSTudents()
       for (const student of students) {
+        console.log(`Actualizando foto para ${student}`)
         const photo = sqliteService.getStudentPhoto(student)
-        console.log(photo)
+        await updatePhotoToAspirantes(student, photo)
       }
       return
     }

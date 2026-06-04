@@ -72,10 +72,10 @@ export class SqliteService {
     return data.map((d) => d.id)
   }
 
-  public getStudentPhoto(id: string) {
+  public getStudentPhoto(id: string): Buffer {
     const query = QUERIES.photo
     const data = this.db.blob(query, id)
-    return data
+    return data as Buffer
   }
 
   private existsPhoto(id: string) {

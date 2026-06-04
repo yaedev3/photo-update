@@ -1,4 +1,4 @@
-import { config, connect, Request } from 'mssql'
+import { config, connect, Int, MAX, Request, VarBinary } from 'mssql'
 
 interface ConnectionModel {
   Escolares: config
@@ -55,6 +55,26 @@ const select = async (query: string, config: config): Promise<any> => {
     const request = new Request()
     const result = await request.query(query)
     return result.recordset
+  } catch (error) {
+    console.log(error)
+  }
+}
+
+export const updateBinaryAspirantes = async (
+  query: string,
+  id: string,
+  photo: Buffer,
+): Promise<void> => {
+  try {
+    await connect({
+      ...connections.Default,
+      ...connections.Aspirantes,
+    })
+    const request = new Request()
+      .input('ClaveUnica', Int, id)
+      .input('Fotografia', VarBinary(MAX), photo)
+    await request.execute(query)
+    console.log('Foto actualizada con exito')
   } catch (error) {
     console.log(error)
   }
