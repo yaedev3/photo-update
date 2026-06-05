@@ -63,7 +63,7 @@ export class MenuService {
 
   private printStatusSummary(downloadStatus: boolean[], month: string): void {
     const success: number = downloadStatus.filter((s) => s).length
-    const error: number = downloadStatus.filter((s) => s).length
+    const error: number = downloadStatus.filter((s) => !s).length
     const total: number = downloadStatus.length
 
     console.log(`Resumen del mes ${month}`)
@@ -83,16 +83,27 @@ export class MenuService {
   public async updatePhotos(): Promise<void> {
     const months: string[] = this.getMonthList()
     const sqliteService = new SqliteService(DbSource.Escolares)
+    const doneList: string[] = this.getPhotosDone()
 
     for (const month of months) {
       const students: string[] = sqliteService.getStudentsByMonth(month)
-      // const students: string[] = this.getTestSTudents()
-      for (const student of students) {
+      const lessStudents: string[] = students.filter(
+        (s) => !doneList.includes(s),
+      )
+      console.log(students.length)
+      console.log(lessStudents.length)
+
+      for (const student of lessStudents) {
         console.log(`Actualizando foto para ${student}`)
+
         const photo = sqliteService.getStudentPhoto(student)
-        await updatePhotoToAspirantes(student, photo)
+        const wasUpdated = await updatePhotoToAspirantes(student, photo)
+
+        if (wasUpdated) {
+          doneList.push(student)
+          this.writeDone(doneList)
+        }
       }
-      return
     }
   }
 
@@ -102,6 +113,14 @@ export class MenuService {
 
   private getMonthList(): string[] {
     return Io.readInputFile('months')
+  }
+
+  private getPhotosDone(): string[] {
+    return Io.readInputFile('done')
+  }
+
+  private writeDone(done: string[]): void {
+    Io.writeInputFile('done', done.join('\n'))
   }
 
   private getDbSource(source: DbSource) {

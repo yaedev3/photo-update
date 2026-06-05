@@ -33,9 +33,15 @@ const writeOutputFile = (file: string, data: any): void => {
   fs.writeJsonSync(outputPath, data, { spaces: 2 })
 }
 
+const writeInputFile = (file: string, data: string): void => {
+  const inputPath = getInputFilePath(file)
+  fs.writeFileSync(inputPath, data)
+}
+
 export default {
   readInputFile,
   readOutputFile,
   checkIfOutputFileExists,
   writeOutputFile,
+  writeInputFile,
 }

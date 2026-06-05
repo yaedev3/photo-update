@@ -14,7 +14,10 @@ export const getStudentPhotoFromAspirantes = async (id: string) => {
   return result[0]['']
 }
 
-export const updatePhotoToAspirantes = async (id: string, photo: Buffer) => {
+export const updatePhotoToAspirantes = async (
+  id: string,
+  photo: Buffer,
+): Promise<boolean> => {
   const query = DB_QUERIES.StudenPhotoUpdate
-  await updateBinaryAspirantes(query, id, photo)
+  return await updateBinaryAspirantes(query, id, photo)
 }

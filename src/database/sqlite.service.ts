@@ -30,6 +30,14 @@ const QUERIES = {
     FROM Photo
     WHERE id = ?
   `,
+  summary: `
+    SELECT
+    month,
+    COUNT(month) as total
+    FROM Photo
+    GROUP BY month
+    ORDER BY month asc
+  `,
 }
 
 export class SqliteService {
@@ -76,6 +84,12 @@ export class SqliteService {
     const query = QUERIES.photo
     const data = this.db.blob(query, id)
     return data as Buffer
+  }
+
+  public getSummary() {
+    const query = QUERIES.summary
+    const data = this.db.where(query, [])
+    console.log(data)
   }
 
   private existsPhoto(id: string) {

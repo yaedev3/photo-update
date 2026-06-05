@@ -64,7 +64,7 @@ export const updateBinaryAspirantes = async (
   query: string,
   id: string,
   photo: Buffer,
-): Promise<void> => {
+): Promise<boolean> => {
   try {
     await connect({
       ...connections.Default,
@@ -74,8 +74,9 @@ export const updateBinaryAspirantes = async (
       .input('ClaveUnica', Int, id)
       .input('Fotografia', VarBinary(MAX), photo)
     await request.execute(query)
-    console.log('Foto actualizada con exito')
+    return true
   } catch (error) {
     console.log(error)
+    return false
   }
 }
