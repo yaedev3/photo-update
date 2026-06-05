@@ -30,6 +30,10 @@ const main = async () => {
     case MenuOptions.Summary:
       menuService.printSummary()
       return
+
+    case MenuOptions.Inconsistency:
+      await menuService.checkInconsistency()
+      return
   }
 }
 

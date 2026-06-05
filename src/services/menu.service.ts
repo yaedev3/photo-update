@@ -16,6 +16,7 @@ export enum MenuOptions {
   DownloadPhotoAspirantes = 'as',
   UploadPhotoList = 'up',
   Summary = 'sum',
+  Inconsistency = 'inc',
 }
 
 const options: Record<MenuOptions, string> = {
@@ -27,6 +28,8 @@ const options: Record<MenuOptions, string> = {
   [MenuOptions.UploadPhotoList]:
     'Para subir las fotos revisadas al servidor de aspirantes',
   [MenuOptions.Summary]: 'Resumen de fotos por en las bases de datos locales',
+  [MenuOptions.Inconsistency]:
+    'Revisa las inconsistencias de meses de los alumnos',
 }
 
 export class MenuService {
@@ -113,6 +116,26 @@ export class MenuService {
   public printSummary(): void {
     this.printSummaryBySource(DbSource.Aspirantes)
     this.printSummaryBySource(DbSource.Escolares)
+  }
+
+  public async checkInconsistency(): Promise<void> {
+    const months: string[] = this.getMonthList()
+    const photoService = new PhotoService()
+    let students: string[] = []
+
+    for (const month of months) {
+      const data: Student[] = await photoService.getPhotosByMonth(month)
+
+      for (const student of data) {
+        if (students.includes(student.id)) {
+          console.log(`Alumno ${student.id} con error en el mes ${month}`)
+        } else {
+          students.push(student.id)
+        }
+      }
+    }
+
+    console.log(students.length)
   }
 
   private printSummaryBySource(source: DbSource): void {
