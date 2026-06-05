@@ -26,6 +26,10 @@ const main = async () => {
     case MenuOptions.UploadPhotoList:
       await menuService.updatePhotos()
       return
+
+    case MenuOptions.Summary:
+      menuService.printSummary()
+      return
   }
 }
 

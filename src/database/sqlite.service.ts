@@ -1,4 +1,4 @@
-import { DbSource } from './interfaces'
+import { DbSource, MonthSummary } from './interfaces'
 import { SqliteDatabase } from './sqllite-database'
 
 const QUERIES = {
@@ -86,10 +86,9 @@ export class SqliteService {
     return data as Buffer
   }
 
-  public getSummary() {
+  public getSummary(): MonthSummary[] {
     const query = QUERIES.summary
-    const data = this.db.where(query, [])
-    console.log(data)
+    return this.db.where(query, [])
   }
 
   private existsPhoto(id: string) {

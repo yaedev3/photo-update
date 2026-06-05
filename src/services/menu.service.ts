@@ -3,6 +3,7 @@ import {
   DbSource,
   getStudentPhotoFromAspirantes,
   getStudentPhotoFromDB,
+  MonthSummary,
   SqliteService,
   updatePhotoToAspirantes,
 } from '../database'
@@ -14,6 +15,7 @@ export enum MenuOptions {
   DownloadPhotoEscolares = 'es',
   DownloadPhotoAspirantes = 'as',
   UploadPhotoList = 'up',
+  Summary = 'sum',
 }
 
 const options: Record<MenuOptions, string> = {
@@ -24,6 +26,7 @@ const options: Record<MenuOptions, string> = {
   [MenuOptions.DownloadPhotoList]: 'Para descargar el listado de fotos por mes',
   [MenuOptions.UploadPhotoList]:
     'Para subir las fotos revisadas al servidor de aspirantes',
+  [MenuOptions.Summary]: 'Resumen de fotos por en las bases de datos locales',
 }
 
 export class MenuService {
@@ -105,6 +108,20 @@ export class MenuService {
         }
       }
     }
+  }
+
+  public printSummary(): void {
+    this.printSummaryBySource(DbSource.Aspirantes)
+    this.printSummaryBySource(DbSource.Escolares)
+  }
+
+  private printSummaryBySource(source: DbSource): void {
+    const sqliteService = new SqliteService(source)
+    const summary: MonthSummary[] = sqliteService.getSummary()
+    const total: number = summary.reduce((prev, curr) => prev + curr.total, 0)
+    console.log(`Fuente ${source}`)
+    summary.forEach((sum) => console.log(`Mes ${sum.month} : ${sum.total}`))
+    console.log(`Total : ${total}`)
   }
 
   private getTestSTudents(): string[] {
