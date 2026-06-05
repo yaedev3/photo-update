@@ -128,14 +128,14 @@ export class MenuService {
 
       for (const student of data) {
         if (students.includes(student.id)) {
-          console.log(`Alumno ${student.id} con error en el mes ${month}`)
+          console.log(`Aspirante ${student.id} con error en el mes ${month}`)
         } else {
           students.push(student.id)
         }
       }
     }
 
-    console.log(students.length)
+    console.log(`Total de aspirantes ${students.length}`)
   }
 
   private printSummaryBySource(source: DbSource): void {
