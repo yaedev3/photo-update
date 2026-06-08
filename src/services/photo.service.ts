@@ -43,7 +43,6 @@ export class PhotoService {
   }
 
   private getPhotosFromFile(): Student[] {
-    console.log(`Obteniendo fotos del archivo para el mes ${this.month}`)
     const file = this.getFileName()
     return <Student[]>Io.readOutputFile(file)
   }

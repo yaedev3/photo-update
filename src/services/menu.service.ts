@@ -7,7 +7,7 @@ import {
   SqliteService,
   updatePhotoToAspirantes,
 } from '../database'
-import { PhotoService } from '.'
+import { FileService, PhotoService } from '.'
 import { Student } from '../interfaces'
 
 export enum MenuOptions {
@@ -17,6 +17,7 @@ export enum MenuOptions {
   UploadPhotoList = 'up',
   Summary = 'sum',
   Inconsistency = 'inc',
+  Check = 'com',
 }
 
 const options: Record<MenuOptions, string> = {
@@ -30,6 +31,8 @@ const options: Record<MenuOptions, string> = {
   [MenuOptions.Summary]: 'Resumen de fotos por en las bases de datos locales',
   [MenuOptions.Inconsistency]:
     'Revisa las inconsistencias de meses de los alumnos',
+  [MenuOptions.Check]:
+    'Descarga fotos para revisar que la actualizacion de fotos fue hecha sin problemas',
 }
 
 export class MenuService {
@@ -47,7 +50,7 @@ export class MenuService {
   public async downloadPhotosFromDb(source: DbSource): Promise<void> {
     const months: string[] = this.getMonthList()
     const sqliteService = new SqliteService(source)
-    const getPohotoFrom = this.getDbSource(source)
+    const getPhotoFrom = this.getDbSource(source)
 
     for (const month of months) {
       const students: Student[] =
@@ -57,7 +60,7 @@ export class MenuService {
 
       if (!canSkipped) {
         for (const student of students) {
-          const photo = await getPohotoFrom(student.id)
+          const photo = await getPhotoFrom(student.id)
           const status = sqliteService.insertPhoto(student.id, month, photo)
           downloadStatus.push(status)
         }
@@ -96,8 +99,8 @@ export class MenuService {
       const lessStudents: string[] = students.filter(
         (s) => !doneList.includes(s),
       )
-      console.log(students.length)
-      console.log(lessStudents.length)
+      console.log(`Aspirantes ${students.length}`)
+      console.log(`Aspirantes por actualizar ${lessStudents.length}`)
 
       for (const student of lessStudents) {
         console.log(`Actualizando foto para ${student}`)
@@ -147,8 +150,27 @@ export class MenuService {
     console.log(`Total : ${total}`)
   }
 
-  private getTestSTudents(): string[] {
-    return ['338089', '316507']
+  public async downloadPhotosToCheck() {
+    const months: string[] = this.getMonthList()
+    const fileService = new FileService()
+
+    for (const month of months) {
+      const photos: Student[] = await this.photoService.getPhotosByMonth(month)
+      const tests: string[] = this.getTestStudents(photos, 100)
+      fileService.setMonth(month)
+
+      console.log(`Mes ${month}`)
+      console.log(`Cantidad de aspirantes ${photos.length}`)
+      console.log(`Cantidad de aspirantes de prueba ${tests.length}`)
+
+      await fileService.storePhotos(tests)
+    }
+  }
+
+  private getTestStudents(array: Student[], interval: number) {
+    return array
+      .filter((_, index) => index % interval === 0)
+      .map((element) => element.id)
   }
 
   private getMonthList(): string[] {

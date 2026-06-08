@@ -34,6 +34,10 @@ const main = async () => {
     case MenuOptions.Inconsistency:
       await menuService.checkInconsistency()
       return
+
+    case MenuOptions.Check:
+      await menuService.downloadPhotosToCheck()
+      return
   }
 }
 
